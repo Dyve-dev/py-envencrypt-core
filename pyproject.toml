@@ -1,0 +1,25 @@
+[project]
+name = "envencrypt-core"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Igor Petrovic", email = "758832+igorovic@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+envencrypt-core = "envencrypt_core:main"
+
+[tool.maturin]
+module-name = "envencrypt_core._core"
+python-packages = ["envencrypt_core"]
+python-source = "src"
+
+[tool.uv]
+cache-keys = [{ file = "pyproject.toml" }, { file = "src/**/*.rs" }, { file = "Cargo.toml" }, { file = "Cargo.lock" }]
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
