@@ -1,6 +1,6 @@
 [project]
-name = "dpapi"
-version = "0.1.0"
+name = "envencrypt_core_dpapi"
+version = "0.1.1"
 description = "DPAPI module for Windows Data Protection API"
 readme = "README.md"
 license = "GPL-3.0-or-later"
@@ -12,9 +12,11 @@ authors = [
 
 [tool.maturin]
 profile = "release"
-module-name = "dpapi"
-python-packages = ["dpapi"]
+bindings = "pyo3"
+module-name = "envencrypt_core.dpapi.dpapi"
+python-packages = ["envencrypt_core"]
 python-source = "python"
+features = ["pyo3/extension-module"]
 
 [build-system]
 requires = ["maturin>=1.0,<2.0"]

@@ -1,5 +1,5 @@
 [package]
-name = "envencrypt_core_dpapi"
+name = "dpapi"
 version = "0.1.0"
 edition = "2021"
 description = "DPAPI module for Windows Data Protection API"
