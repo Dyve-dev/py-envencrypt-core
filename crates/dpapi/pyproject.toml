@@ -1,0 +1,21 @@
+[project]
+name = "dpapi"
+version = "0.1.0"
+description = "DPAPI module for Windows Data Protection API"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.9"
+authors = [
+    { name = "Igor Petrovic", email = "758832+igorovic@users.noreply.github.com" }
+]
+
+
+[tool.maturin]
+profile = "release"
+module-name = "dpapi"
+python-packages = ["dpapi"]
+python-source = "python"
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
