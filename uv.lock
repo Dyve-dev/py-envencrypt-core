@@ -1,0 +1,19 @@
+version = 1
+revision = 3
+requires-python = ">=3.11"
+
+[manifest]
+members = [
+    "envencrypt-core",
+    "envencrypt-core-dpapi",
+]
+
+[[package]]
+name = "envencrypt-core"
+version = "0.1.0"
+source = { editable = "." }
+
+[[package]]
+name = "envencrypt-core-dpapi"
+version = "0.1.0"
+source = { editable = "crates/dpapi" }

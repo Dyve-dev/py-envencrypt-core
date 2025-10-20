@@ -95,11 +95,18 @@ fn hello_from_bin() -> String {
     "Hello from example-ext!".to_string()
 }
 
+#[pyfunction]
+fn protect(data: &[u8]) -> PyResult<Vec<u8>> {
+    let protected = dpapi_protect(data, None, false)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(format!("DPAPI error: {:?}", e)))?;
+    Ok(protected)
+}
+
 /// A Python module implemented in Rust.
 #[pymodule]
 fn dpapi(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
     m.add_function(wrap_pyfunction!(hello_from_bin, m)?)?;
-    
+    m.add_function(wrap_pyfunction!(protect, m)?)?;
     Ok(())
 }

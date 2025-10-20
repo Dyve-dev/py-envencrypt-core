@@ -1,25 +1,53 @@
 [project]
 name = "envencrypt-core"
 version = "0.1.0"
-description = "Add your description here"
+description = "Core encryption utilities with optional platform-specific modules"
 readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE*"]
 authors = [
     { name = "Igor Petrovic", email = "758832+igorovic@users.noreply.github.com" }
 ]
-requires-python = ">=3.14"
-dependencies = []
+requires-python = ">=3.11"
+dependencies = ["dpapi"]
+
+# [project.optional-dependencies]
+# dpapi = [
+#     "envencrypt-core-dpapi>=0.1.0; sys_platform=='win32'"
+# ]
+# keyring = [
+#     "envencrypt-core-keyring>=0.1.0"
+# ]
+# all = [
+#     "envencrypt-core-dpapi>=0.1.0; sys_platform=='win32'",
+#     "envencrypt-core-keyring>=0.1.0"
+# ]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+exclude = ["dist/", "target/"]
 
 [project.scripts]
 envencrypt-core = "envencrypt_core:main"
 
-[tool.maturin]
-module-name = "envencrypt_core._core"
-python-packages = ["envencrypt_core"]
-python-source = "src"
-
 [tool.uv]
+# cache-dir = "../../.uv_cache"
 cache-keys = [{ file = "pyproject.toml" }, { file = "src/**/*.rs" }, { file = "Cargo.toml" }, { file = "Cargo.lock" }]
 
+[tool.uv.sources]
+dpapi = { workspace = true }
+# keyring = { workspace = true }
+[tool.uv.workspace]
+members = ["crates/*"]
+exclude = ["crates/keyring"]
+
+# [build-system]
+# requires = ["setuptools>=61.0", "wheel"]
+# build-backend = "setuptools.build_meta"
+
+# [tool.setuptools.packages.find]
+# where = ["src"]
+# include = ["envencrypt_core*"]
 [build-system]
-requires = ["maturin>=1.0,<2.0"]
-build-backend = "maturin"
+requires = ["uv_build>=0.9.3,<0.10.0"]
+build-backend = "uv_build"
