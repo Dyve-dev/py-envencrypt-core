@@ -36,7 +36,7 @@ jobs:
       - name: Build wheels (Non-Windows)
         if: matrix.os != 'windows-latest'
         run: |
-          uv build --package envencrypt-core
+          uv build --package envencrypt-core --no-build-package envencrypt_core_dpapi
 
       - name: List built wheels
         run: |
