@@ -34,8 +34,16 @@ jobs:
       - name: Install dev dependencies
         run: uv sync --group dev
 
-      - name: Build wheels
-        run: uv build
+      - name: Build wheels (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          uv build --package envencrypt-core
+          uv build --package envencrypt_core_dpapi
+
+      - name: Build wheels (nix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          uv build --package envencrypt-core
 
       - name: List built wheels on Windows
         if: matrix.os == 'windows-latest'
