@@ -1,6 +1,6 @@
 [project]
 name = "envencrypt_core_dpapi"
-version = "0.1.1"
+version = "0.1.2"
 description = "DPAPI module for Windows Data Protection API"
 readme = "README.md"
 license = "GPL-3.0-or-later"

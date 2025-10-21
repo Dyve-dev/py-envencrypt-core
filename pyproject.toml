@@ -1,11 +1,12 @@
 [project]
 name = "envencrypt-core"
-version = "0.1.1"
-description = "Core encryption utilities with optional platform-specific modules"
+version = "0.1.2"
+description = "Core encryption utilities for python envencrypt"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE*"]
 authors = [
+    { name = "Dyve", email = "dev@dyve.ch" },
     { name = "Igor Petrovic", email = "758832+igorovic@users.noreply.github.com" }
 ]
 requires-python = ">=3.11"
@@ -27,12 +28,20 @@ dependencies = ["envencrypt_core_dpapi; sys_platform=='win32'"]
 typeCheckingMode = "strict"
 exclude = ["dist/", "target/"]
 
-[project.scripts]
-envencrypt-core = "envencrypt_core:main"
+# [project.scripts]
+# envencrypt-core = "envencrypt_core:main"
 
 [tool.uv]
 # cache-dir = "../../.uv_cache"
-cache-keys = [{ file = "pyproject.toml" }, { file = "src/**/*.rs" }, { file = "Cargo.toml" }, { file = "Cargo.lock" }]
+cache-keys = [
+    { file = "pyproject.toml" }, 
+    { file = "src/**/*.rs" }, 
+    { file = "crates/**/*.rs" },
+    { file = "crates/**/Cargo.toml" },
+    { file = "crates/**/pyproject.toml" },
+    { file = "Cargo.toml" }, 
+    { file = "Cargo.lock" }
+]
 
 [tool.uv.sources]
 envencrypt_core_dpapi = { workspace = true }
@@ -62,3 +71,9 @@ name = "testpypi"
 url = "https://test.pypi.org/envencrypt-core/"
 publish-url = "https://test.pypi.org/legacy/"
 explicit = true
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/envencrypt/"
+publish-url = "https://upload.pypi.org/legacy/"
+explicit = false

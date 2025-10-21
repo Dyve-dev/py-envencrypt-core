@@ -10,7 +10,7 @@ members = [
 
 [[package]]
 name = "envencrypt-core"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "." }
 dependencies = [
     { name = "envencrypt-core-dpapi", marker = "sys_platform == 'win32'" },
@@ -29,7 +29,7 @@ dev = [{ name = "maturin", specifier = ">=1.9.6" }]
 
 [[package]]
 name = "envencrypt-core-dpapi"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "crates/dpapi" }
 
 [[package]]

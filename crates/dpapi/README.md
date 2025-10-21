@@ -11,14 +11,14 @@ Windows Data Protection API (DPAPI) module for secure data encryption and decryp
 ## Usage
 
 ```python
-import envencrypt_core.dpapi as dpapi
+from envencrypt_core.dpapi import dpapi_protect, dpapi_unprotect
 
 # Encrypt data
 data = b"Hello, World!"
 entropy = b"my_entropy"
-encrypted = dpapi.protect(data, entropy, False)  # False = user scope
+encrypted =dpapi_protect(data, entropy, False)  # False = user scope
 
 # Decrypt data
-decrypted = dpapi.unprotect(encrypted, entropy)
+decrypted = dpapi_unprotect(encrypted, entropy)
 assert decrypted == data
 ```
