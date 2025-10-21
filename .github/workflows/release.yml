@@ -35,7 +35,7 @@ jobs:
         run: uv sync --group dev
 
       - name: Build wheels
-        run: uv build --all-packages
+        run: uv build
 
       - name: List built wheels on Windows
         if: matrix.os == 'windows-latest'
