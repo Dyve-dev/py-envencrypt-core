@@ -29,14 +29,28 @@ jobs:
       - name: Install maturin
         run: uv tool install maturin
 
-      - name: Build wheels
+      - name: Build wheels (Windows)
+        if: matrix.os == 'windows-latest'
         run: uv build --all-packages
+        
+      - name: Build wheels (Non-Windows)
+        if: matrix.os != 'windows-latest'
+        run: |
+          uv build --package envencrypt-core
+          uv build --package envencrypt-core-keyring
 
+      - name: List built wheels
+        run: |
+          echo "Contents of dist directory:"
+          ls -la dist/ || echo "No dist directory found"
+          
       - name: Upload wheels as artifacts
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: wheels-${{ matrix.os }}
-          path: dist/*.whl
+          path: dist/
+          if-no-files-found: warn
 
   publish:
     name: Publish to PyPI
@@ -56,8 +70,21 @@ jobs:
           merge-multiple: true
           path: dist/
 
+      - name: List downloaded wheels
+        run: |
+          echo "Contents of dist directory:"
+          ls -la dist/ || echo "No dist directory found"
+          echo "Wheel files:"
+          find dist/ -name "*.whl" -ls || echo "No .whl files found"
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
       - name: Publish to PyPI
-        run: uv publish --index pypi dist/*.whl
+        run: |
+          if [ -n "$(find dist/ -name "*.whl" 2>/dev/null)" ]; then
+            uv publish --index pypi dist/*.whl
+          else
+            echo "No wheel files found to publish"
+            exit 1
+          fi
