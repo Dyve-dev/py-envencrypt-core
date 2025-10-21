@@ -41,7 +41,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           echo "Contents of dist directory:"
-          dir dist /a || echo "No dist directory found"
+          get-childitem -Force dist || echo "No dist directory found"
 
       - name: List built wheels on Unix-based OS
         if: matrix.os != 'windows-latest'
