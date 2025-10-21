@@ -22,12 +22,17 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
+      
+      - name: Install Rust dependencies in workspace
+        run: cargo fetch
 
       - name: Install Python 3.13
         run: uv python install 3.13
         
       - name: Install maturin
         run: uv add --dev maturin
+      - name: Install dev dependencies
+        run: uv sync --group dev
 
       - name: Build wheels
         run: uv build --all-packages
