@@ -1,6 +1,6 @@
 [package]
 name = "dpapi"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 description = "DPAPI module for Windows Data Protection API"
 license = "GPL-3.0-or-later"

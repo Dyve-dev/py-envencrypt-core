@@ -18,6 +18,7 @@ python-packages = ["envencrypt_core"]
 python-source = "python"
 features = ["pyo3/extension-module"]
 
+
 [build-system]
 requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
