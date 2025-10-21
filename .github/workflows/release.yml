@@ -32,7 +32,14 @@ jobs:
       - name: Build wheels
         run: uv build --all-packages
 
-      - name: List built wheels
+      - name: List built wheels on Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo "Contents of dist directory:"
+          dir dist /a || echo "No dist directory found"
+
+      - name: List built wheels on Unix-based OS
+        if: matrix.os != 'windows-latest'
         run: |
           echo "Contents of dist directory:"
           ls -la dist/ || echo "No dist directory found"
