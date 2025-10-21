@@ -36,7 +36,8 @@ jobs:
       - name: Build wheels (Non-Windows)
         if: matrix.os != 'windows-latest'
         run: |
-          uv build --package envencrypt-core --no-build-package envencrypt_core_dpapi
+          # Build individual packages to avoid dpapi workspace dependency issues
+          uv build --all-packages --config-file pyproject.no-win32.toml
 
       - name: List built wheels
         run: |
