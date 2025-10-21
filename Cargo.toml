@@ -7,4 +7,3 @@ resolver = "2"
 
 [workspace.dependencies]
 pyo3 = { version = "0.22.4", features = ["extension-module", "abi3-py39"] }
-windows = { version = "0.62.2", features = ["Win32_Foundation", "Win32_Security_Cryptography"] }
