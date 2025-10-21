@@ -36,9 +36,13 @@ jobs:
 
       - name: Build wheels (Windows)
         if: matrix.os == 'windows-latest'
+        run: uv build --all-packages
+        
+      - name: Build wheels (Non-Windows)
+        if: matrix.os != 'windows-latest'
         run: |
+          # Build individual packages to avoid dpapi workspace dependency issues
           uv build --package envencrypt-core
-          uv build --package envencrypt_core_dpapi
 
       - name: Build wheels (nix)
         if: matrix.os != 'windows-latest'
