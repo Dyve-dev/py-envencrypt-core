@@ -20,7 +20,4 @@ path = "src/rust/lib.rs"
 pyo3 = { version = "0.22.4", features = ["extension-module", "abi3-py39"] }
 
 [target.'cfg(windows)'.dependencies]
-windows = { version = "0.62.2", features = ["Win32_Foundation", "Win32_Security_Cryptography"] }
-
-[dev-dependencies]
-cargo-make = "0.37.24"
+windows = { version = "0.62.2", features = ["Win32_Foundation", "Win32_Security_Cryptography", "Security_Credentials"] }
