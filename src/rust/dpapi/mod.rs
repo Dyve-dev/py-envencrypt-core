@@ -11,7 +11,7 @@ pub mod dpapi {
             CRYPTPROTECT_UI_FORBIDDEN, CRYPT_INTEGER_BLOB as DATA_BLOB,
         },
     };
-    use windows::Security::Credentials::{PasswordCredential, PasswordVault};
+    
 
     fn to_blob(bytes: &[u8]) -> DATA_BLOB {
         DATA_BLOB {

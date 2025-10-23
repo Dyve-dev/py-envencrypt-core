@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 mod dpapi;
+mod keyring;
 use dpapi::dpapi::{dpapi_protect, dpapi_unprotect};
 
 /// A Python module implemented in Rust.
