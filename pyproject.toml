@@ -10,7 +10,7 @@ authors = [
     { name = "Igor Petrovic", email = "758832+igorovic@users.noreply.github.com" }
 ]
 requires-python = ">=3.11"
-dependencies = ["envencrypt_core_dpapi; sys_platform=='win32'"]
+# dependencies = ["envencrypt_core_dpapi; sys_platform=='win32'"]
 
 # [project.optional-dependencies]
 # dpapi = [
@@ -36,19 +36,19 @@ exclude = ["dist/", "target/"]
 cache-keys = [
     { file = "pyproject.toml" }, 
     { file = "src/**/*.rs" }, 
-    { file = "crates/**/*.rs" },
-    { file = "crates/**/Cargo.toml" },
-    { file = "crates/**/pyproject.toml" },
+    # { file = "crates/**/*.rs" },
+    # { file = "crates/**/Cargo.toml" },
+    # { file = "crates/**/pyproject.toml" },
     { file = "Cargo.toml" }, 
     { file = "Cargo.lock" }
 ]
 
-[tool.uv.sources]
-envencrypt_core_dpapi = { workspace = true, marker = "sys_platform == 'win32'" }
-# keyring = { workspace = true }
-[tool.uv.workspace]
-members = ["crates/*"]
-exclude = ["crates/keyring"]
+# [tool.uv.sources]
+# envencrypt_core_dpapi = { workspace = true, marker = "sys_platform == 'win32'" }
+# # keyring = { workspace = true }
+# [tool.uv.workspace]
+# members = ["crates/*"]
+# exclude = ["crates/keyring"]
 
 # [build-system]
 # requires = ["setuptools>=61.0", "wheel"]
@@ -58,8 +58,16 @@ exclude = ["crates/keyring"]
 # where = ["src"]
 # include = ["envencrypt_core*"]
 [build-system]
-requires = ["uv_build>=0.9.3,<0.10.0"]
-build-backend = "uv_build"
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+bindings = "pyo3"
+module-name = "envencrypt_core.core"
+python-packages = ["envencrypt_core"]
+python-source = "src/python"
+exclude= ["./.github/*"]
+
 
 [dependency-groups]
 dev = [
