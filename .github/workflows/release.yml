@@ -1,0 +1,98 @@
+name: Release
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      
+      - name: Install Rust dependencies in workspace
+        run: cargo fetch
+
+      - name: Install Python 3.13
+        run: uv python install 3.13
+        
+      - name: Install maturin
+        run: uv add --dev maturin
+      - name: Install dev dependencies
+        run: uv sync --group dev
+
+      - name: Build wheels 
+        run: uv build 
+
+      - name: List built wheels on Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo "Contents of dist directory:"
+          get-childitem -Force dist || echo "No dist directory found"
+
+      - name: List built wheels on Unix-based OS
+        if: matrix.os != 'windows-latest'
+        run: |
+          echo "Contents of dist directory:"
+          ls -la dist/ || echo "No dist directory found"
+          
+      - name: Upload wheels as artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wheels-${{ matrix.os }}
+          path: dist/
+          if-no-files-found: warn
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        
+      - name: Download all wheel artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist/
+
+      - name: List downloaded wheels
+        run: |
+          echo "Contents of dist directory:"
+          ls -la dist/ || echo "No dist directory found"
+          echo "Wheel files:"
+          find dist/ -name "*.whl" -ls || echo "No .whl files found"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Publish to PyPI
+        run: |
+          if [ -n "$(find dist/ -name "*.whl" 2>/dev/null)" ]; then
+            uv publish --index pypi
+          else
+            echo "No wheel files found to publish"
+            exit 1
+          fi

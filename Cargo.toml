@@ -1,0 +1,27 @@
+[package]
+name = "envencrypt_core"
+version = "0.2.0"
+edition = "2021"
+description = "Core encryption utilities for python envencrypt"
+license = "GPL-3.0-or-later"
+authors = ["Igor Petrovic <758832+igorovic@users.noreply.github.com>"]
+repository = "https://github.com/igorovic/envencrypt-core"
+documentation = "https://github.com/igorovic/envencrypt-core"
+homepage = "https://github.com/igorovic/envencrypt-core"
+
+exclude = [".github"]
+
+[lib]
+name = "core"
+crate-type = ["cdylib"]
+path = "src/rust/lib.rs"
+
+[dependencies]
+pyo3 = { version = "0.22.4", features = ["extension-module", "abi3-py39"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62.2", features = [
+    "Win32_Foundation",
+    "Win32_Security_Cryptography",
+    "Security_Credentials",
+] }
