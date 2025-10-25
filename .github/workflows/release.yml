@@ -32,7 +32,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.triple }}-sccache-
 
       - name: Build wheels
-        uses: PyO3/maturin-action@v1
+        uses: PyO3/maturin-action@v1.49.0
         with:
           target: ${{ matrix.triple }}
           args: --release --out dist
@@ -43,7 +43,21 @@ jobs:
         with:
           name: wheels-windows-${{ matrix.triple }}
           path: dist
-
+  sdist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build sdist
+        uses: PyO3/maturin-action@v1.49.0
+        with:
+          command: sdist
+          args: --out dist
+      - name: Upload sdist
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-sdist
+          path: dist
+  
   publish:
     name: Publish to PyPI
     needs: [windows]
