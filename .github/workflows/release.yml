@@ -15,12 +15,12 @@ jobs:
           - os: windows-latest
             triple: x86_64-pc-windows-msvc
             arch: x64
-          - os: windows-latest
-            triple: i686-pc-windows-msvc
-            arch: x86
+        #   - os: windows-latest
+        #     triple: i686-pc-windows-msvc
+        #     arch: x86
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: 3.x
           architecture: ${{ matrix.arch }}
@@ -97,11 +97,58 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
+      - name: Check existing packages on PyPI
+        run: |
+          echo "Checking which packages already exist on PyPI..."
+          mkdir -p dist_to_upload
+          
+          for wheel in dist/*.whl; do
+            if [ -f "$wheel" ]; then
+              # Extract package name and version from wheel filename
+              filename=$(basename "$wheel")
+              # Remove file extension and extract name-version part
+              name_version=$(echo "$filename" | sed 's/-[^-]*-[^-]*-[^-]*\.whl$//')
+              package_name=$(echo "$name_version" | sed 's/-[0-9].*//')
+              version=$(echo "$name_version" | sed "s/^$package_name-//")
+              
+              echo "Checking $package_name version $version..."
+              
+              # Check if this version exists on PyPI
+              if pip index versions "$package_name" 2>/dev/null | grep -q "Available versions: .*$version"; then
+                echo "⚠️  $package_name $version already exists on PyPI, skipping..."
+              else
+                echo "✅ $package_name $version not found on PyPI, will upload..."
+                cp "$wheel" dist_to_upload/
+              fi
+            fi
+          done
+          
+          # Also copy sdist files
+          for sdist in dist/*.tar.gz; do
+            if [ -f "$sdist" ]; then
+              filename=$(basename "$sdist")
+              name_version=$(echo "$filename" | sed 's/\.tar\.gz$//')
+              package_name=$(echo "$name_version" | sed 's/-[0-9].*//')
+              version=$(echo "$name_version" | sed "s/^$package_name-//")
+              
+              echo "Checking sdist $package_name version $version..."
+              
+              if pip index versions "$package_name" 2>/dev/null | grep -q "Available versions: .*$version"; then
+                echo "⚠️  $package_name $version already exists on PyPI, skipping sdist..."
+              else
+                echo "✅ $package_name $version not found on PyPI, will upload sdist..."
+                cp "$sdist" dist_to_upload/
+              fi
+            fi
+          done
+
       - name: Publish to PyPI
         run: |
-          if [ -n "$(find dist/ -name "*.whl" 2>/dev/null)" ]; then
-            uv publish --index pypi
+          if [ -n "$(find dist_to_upload/ -name "*.whl" -o -name "*.tar.gz" 2>/dev/null)" ]; then
+            echo "Publishing packages to PyPI..."
+            ls -la dist_to_upload/
+            uv publish --index pypi dist_to_upload/*
           else
-            echo "No wheel files found to publish"
-            exit 1
+            echo "No new packages to publish (all versions already exist on PyPI)"
+            echo "This is not an error - the workflow completed successfully"
           fi
