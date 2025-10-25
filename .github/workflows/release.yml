@@ -73,7 +73,7 @@ jobs:
   
   publish:
     name: Publish to PyPI
-    needs: [windows]
+    needs: [windows, sdist]
     runs-on: ubuntu-latest
     environment:
       name: release
@@ -112,45 +112,16 @@ jobs:
         run: |
           echo "Checking which packages already exist on PyPI..."
           mkdir -p dist_to_upload
-          
-          for wheel in dist/*.whl; do
-            if [ -f "$wheel" ]; then
-              # Extract package name and version from wheel filename
-              filename=$(basename "$wheel")
-              # Remove file extension and extract name-version part
-              name_version=$(echo "$filename" | sed 's/-[^-]*-[^-]*-[^-]*\.whl$//')
-              package_name=$(echo "$name_version" | sed 's/-[0-9].*//')
-              version=$(echo "$name_version" | sed "s/^$package_name-//")
-              
-              echo "Checking $package_name version $version..."
-              
-              # Check if this version exists on PyPI
-              if pip index versions "$package_name" 2>/dev/null | grep -q "Available versions: .*$version"; then
-                echo "⚠️  $package_name $version already exists on PyPI, skipping..."
+          files=($(curl -s https://pypi.org/pypi/envencrypt_core/json | jq -r '.releases | to_entries | sort_by(.key | split(".") | map(tonumber)) | last | .value[].filename'))
+
+          for file in dist/*; do
+              filename=$(basename "$file")
+              if [[ ! " ${files[@]} " =~ " ${filename} " ]]; then
+                  echo "New file: $filename"
+                  cp "$file" dist_to_upload/
               else
-                echo "✅ $package_name $version not found on PyPI, will upload..."
-                cp "$wheel" dist_to_upload/
+                  echo "File already exists on PyPI: $filename"
               fi
-            fi
-          done
-          
-          # Also copy sdist files
-          for sdist in dist/*.tar.gz; do
-            if [ -f "$sdist" ]; then
-              filename=$(basename "$sdist")
-              name_version=$(echo "$filename" | sed 's/\.tar\.gz$//')
-              package_name=$(echo "$name_version" | sed 's/-[0-9].*//')
-              version=$(echo "$name_version" | sed "s/^$package_name-//")
-              
-              echo "Checking sdist $package_name version $version..."
-              
-              if pip index versions "$package_name" 2>/dev/null | grep -q "Available versions: .*$version"; then
-                echo "⚠️  $package_name $version already exists on PyPI, skipping sdist..."
-              else
-                echo "✅ $package_name $version not found on PyPI, will upload sdist..."
-                cp "$sdist" dist_to_upload/
-              fi
-            fi
           done
 
       - name: Publish to PyPI
