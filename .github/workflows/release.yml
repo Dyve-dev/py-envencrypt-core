@@ -1,76 +1,52 @@
 name: Release
+
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+# on:
+#   release:
+#     types: [published]
 
 jobs:
-  build:
-    name: Build wheels on ${{ matrix.os }}
+  windows:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    
+        include:
+          - os: windows-latest
+            triple: x86_64-pc-windows-msvc
+            arch: x64
+          - os: windows-latest
+            triple: i686-pc-windows-msvc
+            arch: x86
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          enable-cache: true
+          python-version: 3.x
+          architecture: ${{ matrix.arch }}
+      - uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\Mozilla\sccache
+          key: ${{ runner.os }}-${{ matrix.triple }}-sccache-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.triple }}-sccache-
+
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.triple }}
+          args: --release --out dist
+          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
       
-      - name: Install Rust dependencies in workspace
-        run: cargo fetch
-
-      - name: Install Python 3.13
-        run: uv python install 3.13
-        
-      - name: Install maturin
-        run: uv add --dev maturin
-      - name: Install dev dependencies
-        run: uv sync --group dev
-
-      - name: Build wheels (Windows)
-        if: matrix.os == 'windows-latest'
-        run: uv build
-      - name: Build wheels (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          export MATURIN_COMPATIBILITY=manylinux_2_28
-          uv build
-      - name: Build wheels (MacOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          export MATURIN_TARGET=x86_64-apple-darwin
-          uv build
-
-      - name: List built wheels on Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          echo "Contents of dist directory:"
-          get-childitem -Force dist || echo "No dist directory found"
-
-      - name: List built wheels on Unix-based OS
-        if: matrix.os != 'windows-latest'
-        run: |
-          echo "Contents of dist directory:"
-          ls -la dist/ || echo "No dist directory found"
-          
-      - name: Upload wheels as artifacts
+      - name: Upload wheels
         uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: wheels-${{ matrix.os }}
-          path: dist/
-          if-no-files-found: warn
+          name: wheels-windows-${{ matrix.triple }}
+          path: dist
 
   publish:
     name: Publish to PyPI
-    needs: build
+    needs: [windows]
     runs-on: ubuntu-latest
     environment:
       name: release
