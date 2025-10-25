@@ -34,8 +34,19 @@ jobs:
       - name: Install dev dependencies
         run: uv sync --group dev
 
-      - name: Build wheels 
-        run: uv build 
+      - name: Build wheels (Windows)
+        if: matrix.os == 'windows-latest'
+        run: uv build
+      - name: Build wheels (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          export MATURIN_COMPATIBILITY=manylinux_2_28
+          uv build
+      - name: Build wheels (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          export MATURIN_TARGET=x86_64-apple-darwin
+          uv build
 
       - name: List built wheels on Windows
         if: matrix.os == 'windows-latest'
