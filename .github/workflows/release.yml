@@ -36,7 +36,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.triple }}-sccache-
 
       - name: Build wheels
-        uses: PyO3/maturin-action@v1.49.0
+        uses: PyO3/maturin-action@v1.49.4
         with:
           target: ${{ matrix.triple }}
           args: --release --out dist
@@ -56,7 +56,7 @@ jobs:
         with:
           enable-cache: true
       - name: Build sdist
-        uses: PyO3/maturin-action@v1.49.0
+        uses: PyO3/maturin-action@v1.49.4
         with:
           command: sdist
           args: --out dist
